@@ -6,12 +6,12 @@ import datetime
 
 from opcua import Server
 import socket
-import datastruct.mb430
+import datastruct.tmachinery
 
 product_uri = "OPCUA EnergyTrain"
 manufacture_name = "LLC mine S.D.Tihova"
 product_name = "shearer-mb450"
-version = 0.01
+version = 0.02
 build_number = 10
 build_date = datetime.datetime.today()
 URL = "opc.tcp://0.0.0.0:4840"
@@ -20,7 +20,7 @@ TCP_IP = '192.168.11.91'
 TCP_PORT = 1500
 BUFFER_SIZE = 4096
 j = 0
-
+fstr = []
 if __name__ == "__main__":
     """Add tags in opcua and start server"""
     server = Server()
@@ -92,14 +92,14 @@ if __name__ == "__main__":
 
     server.start()
 
-    sh = datastruct.mb430.Shearer()
+    sh = datastruct.tmachinery.Shearer()
 
     while True:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((TCP_IP, TCP_PORT))
         data = s.recv(BUFFER_SIZE)
         s.close()
-
+        ## sh.mprint(data, fstr)
         if data[9] == 16 and data[10] == 16:
             sh.shearer_data(data)
             shearer_data_status.set_value(sh.data_status)

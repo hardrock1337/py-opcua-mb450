@@ -1,5 +1,66 @@
+class Frequency:
+    """The frequency convertor data transmission protocol is based on the Broadcast Announce Message (BAM) protocol according to SAE J1939/21\n
+    The difference is in the transmission speed of 125kBd and bypassing the time lag between packets.
+    All CAN messages are 29-bit with 8 byte length.\n
+    The first message with ID=0x1C, 0xECFF, 0x91 is a header (TP.CM) containing the shearer data ID=0x1012, length 74\n
+    Other messages with ID=0x1C, 0xEBFF, 0x91 are data (TP.DT) and contain the following structure by 7 bytes groups:"""
+    data_status = 0  # Reg[0], uchar, 0[bit] - if 1:data valid, 1[bit] - if 1:data simulation
+    software_version = 0.0  # Reg[2,3] HL, uchar, 50.17
+    output_frequency = 0.0  # Reg[4,5], uint, 0-1200, 0.1Hz
+    output_amperage = 0.0   # Reg[6,7], uint, 0-10000, 0.1A
+    output_voltage = 0      # Reg[8,9], uint, 0-1000 Volt
+    voltage_capacitor = 0   # Reg[10,11], uint, 0-2000 Volt
+    sensor_status = 0       # Reg[12], Sstat
+    voltage_input = 0       # Reg[13,14], uint, 0-1500 Volt
+    sensor_voltage_input_status = 0       # Reg[15], Sstat
+    temperature_air_shearer = 0     # Reg[16], uchar, 0-100 Celsiy
+    temperature_air_shearer_status = 0  # Reg[17], Sstat
+    temperature_modem_shearer = 0  # Reg[18], uchar, 0-100 Celsiy
+    temperature_modem_shearer_status = 0  # Reg[19], Sstat
+    output_amperage_contactor = 0 # Reg[20,21], uint, 0-1000A
+    output_amperage_contactor_status = 0 # Reg[22], Sstat
+    temperature_air_frequency = 0 # Reg[23],0-100 Celsiy
+    temperature_air_icebox_igbt = 0 # Reg[24], 0-100 Celsiy
+    temperature_usmemovace = 0  # Reg[25]  UNUSED
+    temperature_brzdy_mf = 0  # Reg[26]  UNUSED
+    temperature_mf_status = 0 # Reg[27], Sstat
+    number_mfk = ""             # Reg[29,30] 25-xxx, Reg[28,29] xx-673
+    error = ""                  # Reg[32-39]
+    errorFreelop = ""           # Reg[40-43]
+    errorFdrive = ""            # Reg[44-47] UNUSED
+    status = ""                 # Reg[48-55]
+    mfk_concentration_ch4 = 0      # Reg[56], uchar, CH4  UNUSED
+    mfk_concentration_ch4_status = 0  # Reg[57], Sstat  UNUSED
+    mfk_material_case = 0       # Reg[58], uchar, UNUSED
+    language = 0                # Reg[59], uchar
+    mfk_year = 0                # Reg[60], uchar, 0-99
+    mfk_mounth = 0              # Reg[61], uchar, 1-12
+    mfk_day = 0                 # Reg[62], uchar, 1-31
+    mfk_hour = 0                # Reg[63], uchar, 0-23
+    mfk_minute = 0              # Reg[64], uchar, 0-59
+    mfk_second = 0              # Reg[65], uchar, 0-59
+    shearer_year = 0            # Reg[66], uchar, 0-99
+    shearer_mounth = 0          # Reg[67], uchar, 1-12
+    shearer_day = 0             # Reg[68], uchar, 1-31
+    shearer_hour = 0            # Reg[69], uchar, 0-23
+    shearer_minute = 0          # Reg[70], uchar, 0-59
+    shearer_second = 0          # Reg[71], uchar, 0-59
+    mfk_number_section = 0      # Reg[72], uchar, 1-250
+    mfk_number_section_status = 0  # Reg[73], Sstat
+
+    def mfk400(self, data):
+        """MFK400.SNO, CAN data protocol"""
+        self.data_status = data[17]
+        self.software_version = float(str(data[19]) + "." + str(data[20]))
+        self.output_frequency = float((data[21] << 8) + data[22])
+
+
 class Shearer:
-    """Class data from shearer"""
+    """The shearer data transmission protocol is based on the Broadcast Announce Message (BAM) protocol according to SAE J1939/21\n
+    The difference is in the transmission speed of 125kBd and bypassing the time lag between packets.
+    All CAN messages are 29-bit with 8 byte length.\n
+    The first message with ID=0x1C, 0xECFF, 0x91 is a header (TP.CM) containing the shearer data ID=0x1010, length 86 or 92byte (according to SW version)\n
+    Other messages with ID=0x1C, 0xEBFF, 0x91 are data (TP.DT) and contain the following structure by 7 bytes groups"""
     data_status = 0  # Reg[0], uchar, 0 - data valid, 1 - data simulation
     software_version = 0.0  # Reg[2,3] HL, uchar, 7.11
     motor_current_m1 = 0  # Reg[4,5], uint, 0-1000 Amper
@@ -56,7 +117,7 @@ class Shearer:
     serial_number = 0  # 0 - 99, 000 - 999
 
     def shearer_data(self, data):
-        """Parser data from mb430"""
+        """MB320, MB450 shearer CAN data protocol"""
         self.data_status = data[17]
         self.software_version = float(str(data[19]) + "." + str(data[20]))
         self.motor_current_m1 = (data[21] << 8) + data[22]
@@ -113,3 +174,16 @@ class Shearer:
         self.level_defence_m5 = data[161]
         self.level_defence_status_m5 = data[162]
         self.serial_number = "FFFF"
+
+class Tmachinery(Shearer, Frequency):
+    def mprint(self, data, fstr):
+        """Print original message in terminal"""
+        j = 0
+        print("\nMessage count bytes:", len(data))
+        for i in data:
+            fstr.append(i)
+            j = j + 1
+            if (j % 12 == 0):
+                print("{0}".format(i), end="\n")
+            else:
+                print("{0}".format(i), end=" ")
