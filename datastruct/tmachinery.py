@@ -52,7 +52,48 @@ class Frequency:
         """MFK400.SNO, CAN data protocol"""
         self.data_status = data[17]
         self.software_version = float(str(data[19]) + "." + str(data[20]))
-        self.output_frequency = float((data[21] << 8) + data[22])
+        self.output_frequency = float((data[21] << 8) + data[22])/10
+        self.output_amperage = float((data[23] << 8) + data[29])/10
+        self.output_voltage = (data[30] << 8) + data[31]
+        self.voltage_capacitor = (data[32] << 8) + data[33]
+        self.sensor_status = data[34]
+        self.voltage_input = (data[35] << 8) + data[41]
+        self.sensor_voltage_input_status = data[42]
+        self.temperature_air_shearer = data[43]
+        self.temperature_air_shearer_status = data[44]
+        self.temperature_modem_shearer = data[45]
+        self.temperature_modem_shearer_status = data[46]
+        self.output_amperage_contactor = (data[47] << 8) + data[53]
+        self.output_amperage_contactor_status = data[54]
+        self.temperature_air_frequency = data[55]
+        self.temperature_air_icebox_igbt = data[56]
+        self.temperature_usmemovace = data[57]
+        self.temperature_brzdy_mf = data[58]
+        self.temperature_mf_status = data[59]
+        self.number_mfk = str((data[65] << 8) + data[66]) + "-" + str((data[67] << 8) + data[68])
+        self.error = str(data[69]) + str(data[70]) + str(data[71]) + str(data[77]) + str(data[78]) + str(data[79]) + str(data[80]) +str(data[81])
+        self.errorFreelop = str(data[82]) + str(data[83]) + str(data[89]) + str(data[90])
+        self.errorFdrive = str(data[91]) + str(data[92]) + str(data[93]) +str(data[94])
+        self.status = str(data[95]) + str(data[101]) +str(data[102]) +str(data[103]) +str(data[104]) +str(data[105]) +str(data[106]) +str(data[106])
+        self.mfk_concentration_ch4 = data[113]
+        self.mfk_concentration_ch4_status = data[114]
+        self.mfk_material_case = data[115]
+        self.language = data[116]
+        self.mfk_year = data[117]
+        self.mfk_mounth = data[118]
+        self.mfk_day = data[119]
+        self.mfk_hour = data[125]
+        self.mfk_minute = data[126]
+        self.mfk_second = data[127]
+        self.shearer_year = data[128]
+        self.shearer_mounth = data[129]
+        self.shearer_day = data[130]
+        self.shearer_hour = data[131]
+        self.shearer_minute = data[137]
+        self.shearer_second = data[138]
+        self.mfk_number_section = data[139]
+        self.mfk_number_section_status = data[140]
+
 
 
 class Shearer:
