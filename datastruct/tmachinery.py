@@ -94,8 +94,6 @@ class Frequency:
         self.mfk_number_section = data[139]
         self.mfk_number_section_status = data[140]
 
-
-
 class Shearer:
     """The shearer data transmission protocol is based on the Broadcast Announce Message (BAM) protocol according to SAE J1939/21\n
     The difference is in the transmission speed of 125kBd and bypassing the time lag between packets.
@@ -114,7 +112,7 @@ class Shearer:
     motor_status_m4 = 0  # Reg[15], Sstat, 0-15
     motor_current_m5 = 0  # Reg[16,17], uint, 0-1000 Amper
     motor_status_m5 = 0  # Reg[18], Sstat, 0-15
-    speed = 0.0  # Reg[19,20], uint, 0-250, 0.1m/min 20 registr empty?
+    speed = 0.0  # Reg[19,20], uint, 0-250, 0.1m/min
     speed_status = 0  # Reg[21], Sstat, 0-15
     current_year = ""  # Reg[22], uchar, 0-99 year
     current_mounth = ""  # Reg[23], uchar, 0-12 mounth
@@ -142,9 +140,9 @@ class Shearer:
     position_number_section = 0  # Reg[55], uchar, 0 - 250
     position_number_section_status = 0  # Reg[56], Sstat
     voltage = 0  # Reg[57,58], uint, 0 - 1500
-    voltage_status = 0
-    error = ""
-    status = ""
+    voltage_status = 0 # Reg[59], Sstat
+    error = ""      # Reg[60-71]
+    status = ""     # Reg[72-75]
     level_defence_m1 = 0  # Reg[76], uchar, 0 - 250
     level_defence_status_m1 = 0  # Reg[77], Sstat
     level_defence_m2 = 0  # Reg[78], uchar, 0 - 250
@@ -167,7 +165,7 @@ class Shearer:
         self.motor_status_m2 = data[31]
         self.motor_current_m3 = (data[32] << 8) + data[33]
         self.motor_status_m3 = data[34]
-        self.motor_current_m4 = (data[40] << 8) + data[41]
+        self.motor_current_m4 = (data[35] << 8) + data[41]
         self.motor_status_m4 = data[42]
         self.motor_current_m5 = (data[43] << 8) + data[44]
         self.motor_status_m5 = data[45]
@@ -186,7 +184,7 @@ class Shearer:
         self.sensor_speed = data[69]
         self.sensor_pologenie = data[70]
         self.operation_mode = data[71]
-        self.shearer_type = data[72]
+        self.shearer_type = data[77]
         self.reason_off = data[78]
         self.traversed_path = (data[80] << 24) + (data[81] << 16) + (data[82] << 8) + data[83]
         self.traversed_path_status = data[89]
@@ -214,7 +212,7 @@ class Shearer:
         self.level_defence_status_m4 = data[155]
         self.level_defence_m5 = data[161]
         self.level_defence_status_m5 = data[162]
-        self.serial_number = "FFFF"
+        self.serial_number = (data[163] << 8) + data[164]
 
 class Tmachinery(Shearer, Frequency):
     def mprint(self, data, fstr):
