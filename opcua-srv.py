@@ -138,6 +138,7 @@ if __name__ == "__main__":
     frequency_mfk_number_section = frequency.add_variable(ns_fr, "mfk_number_section", 0)
     frequency_mfk_number_section_status = frequency.add_variable(ns_fr, "mfk_number_section_status", 0)
 
+
     def tcpconnect(t):
         time.sleep(t)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -145,7 +146,7 @@ if __name__ == "__main__":
             s.connect((TCP_IP, TCP_PORT))
             data = s.recv(BUFFER_SIZE)
             status_drv_connection = True
-            print("Connect to",TCP_IP,":",TCP_PORT, " succesfull.")
+            print("Connect to", TCP_IP, ":", TCP_PORT, " succesfull.")
             while len(data) > 0:
                 if data[9] == 16 and data[10] == 16:
                     sh.shearer_data(data)
@@ -249,9 +250,11 @@ if __name__ == "__main__":
                     frequency_shearer_second.set_value(freq.shearer_second)
                     frequency_mfk_number_section.set_value(freq.mfk_number_section)
                     frequency_mfk_number_section_status.set_value(freq.mfk_number_section_status)
-                    # print(freq.__dict__)
+                print(sh.__dict__)
+                print(freq.__dict__)
+                data = s.recv(BUFFER_SIZE)
         except:
-            print(TCP_IP,":",TCP_PORT, " connection not succesfull!")
+            print(TCP_IP, ":", TCP_PORT, " connection not succesfull!")
             status_drv_connection = False
             pass
         finally:
