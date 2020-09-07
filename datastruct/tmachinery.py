@@ -1,4 +1,23 @@
-class Frequency:
+class Tmachinery:
+    def mprint(self, data, fstr):
+        """Print original message in terminal"""
+        j = 0
+        print("\nMessage count bytes:", len(data))
+        for i in data:
+            fstr.append(i)
+            j = j + 1
+            if (j % 12 == 0):
+                print("{0}".format(i), end="\n")
+            else:
+                print("{0}".format(i), end=" ")
+
+    def get_tags(self, class_field):
+        list_tags = []
+        for i in range(0,len(class_field)):
+            if class_field[i].find("_", 0, 1) == -1:
+                list_tags.append(class_field[i])
+        return list_tags
+class Frequency(Tmachinery):
     """The frequency convertor data transmission protocol is based on the Broadcast Announce Message (BAM) protocol according to SAE J1939/21\n
     The difference is in the transmission speed of 125kBd and bypassing the time lag between packets.
     All CAN messages are 29-bit with 8 byte length.\n
@@ -24,7 +43,7 @@ class Frequency:
     temperature_usmemovace = 0  # Reg[25]  UNUSED
     temperature_brzdy_mf = 0  # Reg[26]  UNUSED
     temperature_mf_status = 0 # Reg[27], Sstat
-    number_mfk = ""             # Reg[29,30] 25-xxx, Reg[28,29] xx-673
+    number_mfk = ""             # Reg[30,31] 25-xxx, Reg[28,29] xx-673
     error = ""                  # Reg[32-39]
     errorFreelop = ""           # Reg[40-43]
     errorFdrive = ""            # Reg[44-47] UNUSED
@@ -93,8 +112,7 @@ class Frequency:
         self.shearer_second = data[138]
         self.mfk_number_section = data[139]
         self.mfk_number_section_status = data[140]
-
-class Shearer:
+class Shearer(Tmachinery):
     """The shearer data transmission protocol is based on the Broadcast Announce Message (BAM) protocol according to SAE J1939/21\n
     The difference is in the transmission speed of 125kBd and bypassing the time lag between packets.
     All CAN messages are 29-bit with 8 byte length.\n
@@ -214,15 +232,3 @@ class Shearer:
         self.level_defence_status_m5 = data[162]
         self.serial_number = (data[163] << 8) + data[164]
 
-class Tmachinery(Shearer, Frequency):
-    def mprint(self, data, fstr):
-        """Print original message in terminal"""
-        j = 0
-        print("\nMessage count bytes:", len(data))
-        for i in data:
-            fstr.append(i)
-            j = j + 1
-            if (j % 12 == 0):
-                print("{0}".format(i), end="\n")
-            else:
-                print("{0}".format(i), end=" ")

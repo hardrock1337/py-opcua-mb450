@@ -169,12 +169,28 @@ if __name__ == "__main__":
     server.set_endpoint(URL)
     server.set_build_info(product_uri, manufacture_name, product_name, version, build_number, build_date)
 
+    list_tags = []
+    sh = datastruct.tmachinery.Shearer()
+    freq = datastruct.tmachinery.Frequency()
+    cfg_shearer = sh.get_tags(sh.__dir__())
+    cfg_frequency = freq.get_tags(sh.__dir__())
+
+
     ns_sh = server.register_namespace("shearer")
     ns_fr = server.register_namespace("frequency")
     objects = server.get_objects_node()
     shearer = objects.add_object(ns_sh, "mb450")
     frequency = objects.add_object(ns_fr, "mfk400")
 
+    def gen_cfg(ns_name, ns_link, obj_link, tags_from_class):
+        for i in range(0, len(tags_from_class)):
+            s = ns_name + "_" + tags_from_class[i]
+            list_tags[i].append(s)
+            list_tags[i] = obj_link.add_variable(ns_link, ns_name, 0)
+        return list_tags
+
+    print(cfg_shearer)
+    #print(gen_cfg("test_sh", ns_sh, shearer, cfg_shearer))
     shearer_data_status = shearer.add_variable(ns_sh, "data_status", 0)
     shearer_software_version = shearer.add_variable(ns_sh, "software_version", 0.0)
     shearer_motor_status_m1 = shearer.add_variable(ns_sh, "motor_sensor_status_m1", 0)
@@ -280,8 +296,8 @@ if __name__ == "__main__":
         server.start()
         print("Server start at ", datetime.datetime.now())
         status_srv_run = True
-        sh = datastruct.tmachinery.Shearer()
-        freq = datastruct.tmachinery.Frequency()
+
+        #print(freq.__dict__)
         srv = threading.Thread(target=get_data(status_drv_connection))
         srv.daemon = True
         srv.start()
