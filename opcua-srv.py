@@ -23,7 +23,7 @@ ipsrv = '192.168.11.91'
 tcpport = 1500
 TCP_IP = '192.168.11.91'
 TCP_PORT = 1500
-TCP_RECONNECT_TIMEOUT = 3      # 3 second
+tcp_connect_timeout = 5      # second
 BUFFER_SIZE = 4096
 status_drv_connection = False
 status_srv_run = False
@@ -41,15 +41,16 @@ fstr = []
 def get_data(status_drv_connection):
         #loop = asyncio.get_event_loop()
         #loop.run_until_complete(tcp_echo_client(ipsrv, tcpport, loop))
+        count = 0
         while status_drv_connection == False:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
                 s.connect((TCP_IP, TCP_PORT))
-                s.settimeout(TCP_RECONNECT_TIMEOUT)
+                s.settimeout(tcp_connect_timeout)
                 data = s.recv(BUFFER_SIZE)
                 status_drv_connection = True
                 print("Connect to", TCP_IP, ":", TCP_PORT, " succesfull.")
-                while len(data) > 0:
+                for i in range(1, 1000):
                     if data[9] == 16 and data[10] == 16:
                             sh.shearer_data(data)
                             shearer_data_status.set_value(sh.data_status)
@@ -152,16 +153,16 @@ def get_data(status_drv_connection):
                             frequency_shearer_second.set_value(freq.shearer_second)
                             frequency_mfk_number_section.set_value(freq.mfk_number_section)
                             frequency_mfk_number_section_status.set_value(freq.mfk_number_section_status)
-                        # print(sh.__dict__)
-                        # print(freq.__dict__)
                     data = s.recv(BUFFER_SIZE)
-            except:
+                    if i > 1000 or len(data) < 0:
+                        break
+
+            except Exception as ex:
                 print(TCP_IP, ":", TCP_PORT, " connection not succesfull!")
-                status_drv_connection = False
-                pass
             finally:
-                print("Connection lose!")
+                status_drv_connection = False
                 s.close()
+
 
 if __name__ == "__main__":
     """Add tags in opcua and start server"""
@@ -275,22 +276,22 @@ if __name__ == "__main__":
     frequency_shearer_second = frequency.add_variable(ns_fr, "shearer_second", 0)
     frequency_mfk_number_section = frequency.add_variable(ns_fr, "mfk_number_section", 0)
     frequency_mfk_number_section_status = frequency.add_variable(ns_fr, "mfk_number_section_status", 0)
+    while status_srv_run == False:
+        try:
+            server.start()
+            print("Server start at ", datetime.datetime.now())
+            status_srv_run = True
+            sh = datastruct.tmachinery.Shearer()
+            freq = datastruct.tmachinery.Frequency()
+            srv = threading.Thread(target=get_data(status_drv_connection))
+            srv.daemon = True
+            srv.start()
+            #if status_srv_run == True:
 
-    try:
-        server.start()
-        print("Server start at ", datetime.datetime.now())
-        status_srv_run = True
-        sh = datastruct.tmachinery.Shearer()
-        freq = datastruct.tmachinery.Frequency()
-        srv = threading.Thread(target=get_data(status_drv_connection))
-        srv.daemon = True
-        srv.start()
-        #if status_srv_run == True:
 
-
-    except:
-        print("Except server failed ", datetime.datetime.now)
-        status_srv_run = False
-    finally:
-        print("Server stop in ", datetime.datetime.now)
-        server.stop()
+        except Exception as ex:
+            print("Except server failed: ", ex)
+            status_srv_run = False
+        finally:
+            print("Server stop in ", datetime.datetime.now)
+            server.stop()
