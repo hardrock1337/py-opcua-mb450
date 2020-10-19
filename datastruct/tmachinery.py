@@ -1,4 +1,21 @@
-class Frequency:
+class Tmachinery:
+    @staticmethod
+    def message_print(data, fstr):
+        """Print original message in terminal"""
+        j = 0
+        print("\nMessage count bytes:", len(data))
+        for i in data:
+            fstr.append(i)
+            j = j + 1
+            if (j % 12 == 0):
+                print("{0}".format(i), end="\n")
+            else:
+                print("{0}".format(i), end=" ")
+
+    def parserdata(self):
+        """Parsing information by bits"""
+
+class Frequency(Tmachinery):
     """The frequency convertor data transmission protocol is based on the Broadcast Announce Message (BAM) protocol according to SAE J1939/21\n
     The difference is in the transmission speed of 125kBd and bypassing the time lag between packets.
     All CAN messages are 29-bit with 8 byte length.\n
@@ -132,7 +149,7 @@ class Frequency:
         self.mfk_number_section = data[139]
         self.mfk_number_section_status = data[140]
 
-class Shearer:
+class Shearer(Tmachinery):
     """The shearer data transmission protocol is based on the Broadcast Announce Message (BAM) protocol according to SAE J1939/21\n
     The difference is in the transmission speed of 125kBd and bypassing the time lag between packets.
     All CAN messages are 29-bit with 8 byte length.\n
@@ -384,6 +401,14 @@ class Shearer:
         self.current_minute = data[58]
         self.current_sec = data[59]
         self.management_rele = data[65]
+        self.management_rele_Rplus = 0  # Reg[28:0]
+        self.management_rele_Rminus = 0  # Reg[28:1]
+        self.management_rele_SML = 0  # Reg[28:2]
+        self.management_rele_SMP = 0  # Reg[28:3]
+        self.management_rele_stop_konv = 0  # Reg[28:4]
+        self.management_rele_shearer_work_mode = 0  # Reg[28:5]
+        self.management_rele_shearer_signal_on = 0  # Reg[28:6]
+        self.management_rele_stop_auto = 0  # Reg[28:7]
         self.management_command_panel = data[66]
         self.electro_hydro_valve = data[67]
         self.management_drobilka = data[68]
@@ -432,16 +457,3 @@ class Shearer:
         self.level_defence_status_m5 = data[162]
         self.serial_number = (data[163] << 8) + data[164]
 
-class Tmachinery(Shearer, Frequency):
-    @staticmethod
-    def message_print(data, fstr):
-        """Print original message in terminal"""
-        j = 0
-        print("\nMessage count bytes:", len(data))
-        for i in data:
-            fstr.append(i)
-            j = j + 1
-            if (j % 12 == 0):
-                print("{0}".format(i), end="\n")
-            else:
-                print("{0}".format(i), end=" ")
