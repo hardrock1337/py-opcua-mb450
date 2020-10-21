@@ -32,8 +32,9 @@ j = 0
 fstr = []
 
 
-def get_data(status_drv_connection):
-    while status_drv_connection == False:
+def get_data():
+    global status_drv_connection
+    while not status_drv_connection:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((TCP_IP, TCP_PORT))
@@ -153,10 +154,10 @@ def get_data(status_drv_connection):
                     frequency_mfk_status_2.set_value(freq.mfk_status_2)
                     frequency_mfk_status_3.set_value(freq.mfk_status_3)
                     frequency_mfk_status_4.set_value(freq.mfk_status_4)
-                    frequency_mfk_status_5.set_value(freq.mfk_status_5)
-                    frequency_mfk_status_6.set_value(freq.mfk_status_6)
-                    frequency_mfk_status_7.set_value(freq.mfk_status_7)
-                    frequency_mfk_status_8.set_value(freq.mfk_status_8)
+                    # frequency_mfk_status_5.set_value(freq.mfk_status_5)
+                    # frequency_mfk_status_6.set_value(freq.mfk_status_6)
+                    # frequency_mfk_status_7.set_value(freq.mfk_status_7)
+                    # frequency_mfk_status_8.set_value(freq.mfk_status_8)
                     frequency_mfk_concentration_ch4.set_value(freq.mfk_concentration_ch4)
                     frequency_mfk_concentration_ch4_status.set_value(freq.mfk_concentration_ch4_status)
                     # frequency_mfk_material_case.set_value(freq.mfk_material_case)
@@ -179,12 +180,11 @@ def get_data(status_drv_connection):
                 if i > 100000 or len(data) < 0:
                     print("Current work state + 100.000 cycle parse data")
                     break
-
-        except Exception as ex:
+        except Exception as exc:
             print(TCP_IP, ":", TCP_PORT, " connection not succesfull!")
-            print(ex)
-        finally:
+            print(exc)
             status_drv_connection = False
+        finally:
             s.close()
 
 def current_value_logger(LOG_VALUE_ENABLE):
@@ -335,14 +335,14 @@ if __name__ == "__main__":
     frequency_shearer_second = frequency.add_variable(ns_fr, "shearer_second", 0)
     frequency_mfk_number_section = frequency.add_variable(ns_fr, "mfk_number_section", 0)
     frequency_mfk_number_section_status = frequency.add_variable(ns_fr, "mfk_number_section_status", 0)
-    while status_srv_run == False:
+    while not status_srv_run:
         try:
             server.start()
             print("Server start at ", datetime.datetime.now())
             status_srv_run = True
             sh = datastruct.tmachinery.Shearer()
             freq = datastruct.tmachinery.Frequency()
-            srv = threading.Thread(target=get_data(status_drv_connection))
+            srv = threading.Thread(target=get_data())
             srv.daemon = True
             srv.start()
         except Exception as ex:
