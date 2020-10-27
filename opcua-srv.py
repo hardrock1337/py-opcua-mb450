@@ -1,21 +1,16 @@
-# import sys
-# import random
-# import time
-# import cryptography
+import cryptography
 import datetime
-import time
-import traceback
 import threading
 
 from opcua import Server
 import socket
 import datastruct.tmachinery
 
-product_uri = "OPCUA EnergyTrain"
+product_uri = "EnergyTrain"
 manufacture_name = "LLC mine S.D.Tihova"
 product_name = "tihova-lava"
-version = 0.1
-build_number = 12
+version = "0.1"
+build_number = "12"
 build_date = datetime.datetime.today()
 URL = "opc.tcp://0.0.0.0:4840"
 
@@ -31,161 +26,153 @@ status_srv_run = False
 j = 0
 fstr = []
 
+def parse_data(data):
+    if data[9] == 16 and data[10] == 16:
+        sh.shearer_data(data)
+        shearer_data_status.set_value(sh.data_status)
+        shearer_voltage.set_value(sh.voltage)
+        shearer_software_version.set_value(sh.software_version)
+        shearer_motor_current_m1.set_value(sh.motor_current_m1)
+        shearer_motor_status_m1.set_value(sh.motor_status_m1)
+        shearer_motor_current_m2.set_value(sh.motor_current_m2)
+        shearer_motor_status_m2.set_value(sh.motor_current_m2)
+        shearer_motor_current_m3.set_value(sh.motor_current_m3)
+        shearer_motor_status_m3.set_value(sh.motor_current_m3)
+        shearer_motor_current_m4.set_value(sh.motor_current_m4)
+        shearer_motor_status_m4.set_value(sh.motor_current_m4)
+        shearer_motor_current_m5.set_value(sh.motor_current_m5)
+        shearer_motor_status_m5.set_value(sh.motor_current_m5)
+        shearer_speed.set_value(sh.speed)
+        shearer_speed_status.set_value(sh.speed_status)
+        shearer_current_year.set_value(sh.current_year)
+        shearer_current_mounth.set_value(sh.current_mounth)
+        shearer_current_day.set_value(sh.current_day)
+        shearer_current_hour.set_value(sh.current_hour)
+        shearer_current_minute.set_value(sh.current_minute)
+        shearer_current_sec.set_value(sh.current_sec)
+        shearer_management_rele.set_value(sh.management_rele)
+        shearer_management_command_panel.set_value(sh.management_command_panel)
+        shearer_electro_hydro_valve.set_value(sh.electro_hydro_valve)
+        shearer_management_drobilka.set_value(sh.management_drobilka)
+        shearer_sensor_speed.set_value(sh.sensor_speed)
+        shearer_sensor_pologenie.set_value(sh.sensor_pologenie)
+        shearer_operation_mode.set_value(sh.operation_mode)
+        shearer_type.set_value(sh.shearer_type)
+        shearer_reason_off.set_value(sh.reason_off)
+        shearer_traversed_path.set_value(sh.traversed_path)
+        shearer_traversed_path_status.set_value(sh.traversed_path_status)
+        shearer_position.set_value(sh.position)
+        shearer_position_status.set_value(sh.position_status)
+        shearer_time_work.set_value(sh.time_work)
+        shearer_time_work_status.set_value(sh.time_work_status)
+        shearer_speed_regulation.set_value(sh.speed_regulation)
+        shearer_speed_regulation_status.set_value(sh.speed_regulation_status)
+        shearer_position_number_section.set_value(sh.position_number_section)
+        shearer_position_number_section_status.set_value(sh.position_number_section_status)
+        shearer_voltage.set_value(sh.voltage)
+        shearer_voltage_status.set_value(sh.voltage_status)
+        shearer_error_1.set_value(sh.error_1)
+        shearer_error_2.set_value(sh.error_2)
+        shearer_error_3.set_value(sh.error_3)
+        shearer_error_4.set_value(sh.error_4)
+        shearer_error_5.set_value(sh.error_5)
+        shearer_error_6.set_value(sh.error_6)
+        shearer_error_7.set_value(sh.error_7)
+        shearer_error_8.set_value(sh.error_8)
+        shearer_error_9.set_value(sh.error_9)
+        shearer_error_10.set_value(sh.error_10)
+        shearer_error_11.set_value(sh.error_11)
+        shearer_error_12.set_value(sh.error_12)
+        shearer_status_1.set_value(sh.status_1)
+        shearer_status_2.set_value(sh.status_2)
+        shearer_status_3.set_value(sh.status_3)
+        shearer_status_4.set_value(sh.status_4)
+        shearer_level_defence_m1.set_value(sh.level_defence_m1)
+        shearer_level_defence_status_m1.set_value(sh.level_defence_status_m1)
+        shearer_level_defence_m2.set_value(sh.level_defence_m2)
+        shearer_level_defence_status_m2.set_value(sh.level_defence_status_m2)
+        shearer_level_defence_m3.set_value(sh.level_defence_m3)
+        shearer_level_defence_status_m3.set_value(sh.level_defence_status_m3)
+        shearer_level_defence_m4.set_value(sh.level_defence_m4)
+        shearer_level_defence_status_m4.set_value(sh.level_defence_status_m4)
+        shearer_level_defence_m5.set_value(sh.level_defence_m5)
+        shearer_level_defence_status_m5.set_value(sh.level_defence_status_m5)
+        shearer_serial_number.set_value(sh.serial_number)
+    if data[9] == 18 and data[10] == 16:
+        freq.mfk400(data)
+        frequency_data_status.set_value(freq.data_status)
+        frequency_software_version.set_value(freq.software_version)
+        frequency_output_frequency.set_value(freq.output_frequency)
+        frequency_output_amperage.set_value(freq.output_amperage)
+        frequency_output_voltage.set_value(freq.output_voltage)
+        frequency_voltage_capacitor.set_value(freq.voltage_capacitor)
+        frequency_sensor_status.set_value(freq.sensor_status)
+        frequency_voltage_input.set_value(freq.voltage_input)
+        frequency_sensor_voltage_input_status.set_value(freq.sensor_voltage_input_status)
+        frequency_temperature_air_shearer.set_value(freq.temperature_air_shearer)
+        frequency_temperature_air_shearer_status.set_value(freq.temperature_air_shearer_status)
+        frequency_temperature_modem_shearer.set_value(freq.temperature_modem_shearer)
+        frequency_temperature_modem_shearer_status.set_value(freq.temperature_modem_shearer_status)
+        frequency_output_amperage_contactor.set_value(freq.output_amperage_contactor)
+        frequency_output_amperage_contactor_status.set_value(freq.output_amperage_contactor_status)
+        frequency_temperature_air_frequency.set_value(freq.temperature_air_frequency)
+        frequency_temperature_air_icebox_igbt.set_value(freq.temperature_air_icebox_igbt)
+        # frequency_temperature_usmemovace = 0  # Reg[25]  UNUSED
+        # frequency_temperature_brzdy_mf = 0  # Reg[26]  UNUSED
+        frequency_temperature_mf_status.set_value(freq.temperature_mf_status)
+        frequency_number_mfk.set_value(freq.number_mfk)
+        frequency_error_1.set_value(freq.error_1)
+        frequency_error_2.set_value(freq.error_2)
+        frequency_error_3.set_value(freq.error_3)
+        frequency_error_4.set_value(freq.error_4)
+        frequency_error_5.set_value(freq.error_5)
+        frequency_error_6.set_value(freq.error_6)
+        frequency_error_7.set_value(freq.error_7)
+        frequency_error_8.set_value(freq.error_8)
+        frequency_errorFreelop_1.set_value(freq.errorFreelop_1)
+        frequency_errorFreelop_2.set_value(freq.errorFreelop_2)
+        frequency_errorFreelop_3.set_value(freq.errorFreelop_3)
+        frequency_errorFreelop_4.set_value(freq.errorFreelop_4)
+        # frequency_errorFdrive.set_value(freq.errorFdrive)
+        frequency_mfk_status_1.set_value(freq.mfk_status_1)
+        frequency_mfk_status_2.set_value(freq.mfk_status_2)
+        frequency_mfk_status_3.set_value(freq.mfk_status_3)
+        frequency_mfk_status_4.set_value(freq.mfk_status_4)
+        # frequency_mfk_status_5.set_value(freq.mfk_status_5)
+        # frequency_mfk_status_6.set_value(freq.mfk_status_6)
+        # frequency_mfk_status_7.set_value(freq.mfk_status_7)
+        # frequency_mfk_status_8.set_value(freq.mfk_status_8)
+        frequency_mfk_concentration_ch4.set_value(freq.mfk_concentration_ch4)
+        frequency_mfk_concentration_ch4_status.set_value(freq.mfk_concentration_ch4_status)
+        # frequency_mfk_material_case.set_value(freq.mfk_material_case)
+        frequency_language.set_value(freq.language)
+        frequency_mfk_year.set_value(freq.mfk_year)
+        frequency_mfk_mounth.set_value(freq.mfk_mounth)
+        frequency_mfk_day.set_value(freq.mfk_day)
+        frequency_mfk_hour.set_value(freq.mfk_hour)
+        frequency_mfk_minute.set_value(freq.mfk_minute)
+        frequency_mfk_second.set_value(freq.mfk_second)
+        frequency_shearer_year.set_value(freq.shearer_year)
+        frequency_shearer_mounth.set_value(freq.shearer_mounth)
+        frequency_shearer_day.set_value(freq.shearer_day)
+        frequency_shearer_hour.set_value(freq.shearer_hour)
+        frequency_shearer_minute.set_value(freq.shearer_minute)
+        frequency_shearer_second.set_value(freq.shearer_second)
+        frequency_mfk_number_section.set_value(freq.mfk_number_section)
+        frequency_mfk_number_section_status.set_value(freq.mfk_number_section_status)
 
-def get_data():
-    global status_drv_connection
-    while not status_drv_connection:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            s.connect((TCP_IP, TCP_PORT))
-            s.settimeout(TCP_CONNECT_TIMEOUT)
-            data = s.recv(BUFFER_SIZE)
-            status_drv_connection = True
-            print("Connect to", TCP_IP, ":", TCP_PORT, " succesfull.")
-            for i in range(1, 100000):
-                if data[9] == 16 and data[10] == 16:
-                    sh.shearer_data(data)
-                    shearer_data_status.set_value(sh.data_status)
-                    shearer_voltage.set_value(sh.voltage)
-                    shearer_software_version.set_value(sh.software_version)
-                    shearer_motor_current_m1.set_value(sh.motor_current_m1)
-                    shearer_motor_status_m1.set_value(sh.motor_status_m1)
-                    shearer_motor_current_m2.set_value(sh.motor_current_m2)
-                    shearer_motor_status_m2.set_value(sh.motor_current_m2)
-                    shearer_motor_current_m3.set_value(sh.motor_current_m3)
-                    shearer_motor_status_m3.set_value(sh.motor_current_m3)
-                    shearer_motor_current_m4.set_value(sh.motor_current_m4)
-                    shearer_motor_status_m4.set_value(sh.motor_current_m4)
-                    shearer_motor_current_m5.set_value(sh.motor_current_m5)
-                    shearer_motor_status_m5.set_value(sh.motor_current_m5)
-                    shearer_speed.set_value(sh.speed)
-                    shearer_speed_status.set_value(sh.speed_status)
-                    shearer_current_year.set_value(sh.current_year)
-                    shearer_current_mounth.set_value(sh.current_mounth)
-                    shearer_current_day.set_value(sh.current_day)
-                    shearer_current_hour.set_value(sh.current_hour)
-                    shearer_current_minute.set_value(sh.current_minute)
-                    shearer_current_sec.set_value(sh.current_sec)
-                    shearer_management_rele.set_value(sh.management_rele)
-                    shearer_management_command_panel.set_value(sh.management_command_panel)
-                    shearer_electro_hydro_valve.set_value(sh.electro_hydro_valve)
-                    shearer_management_drobilka.set_value(sh.management_drobilka)
-                    shearer_sensor_speed.set_value(sh.sensor_speed)
-                    shearer_sensor_pologenie.set_value(sh.sensor_pologenie)
-                    shearer_operation_mode.set_value(sh.operation_mode)
-                    shearer_type.set_value(sh.shearer_type)
-                    shearer_reason_off.set_value(sh.reason_off)
-                    shearer_traversed_path.set_value(sh.traversed_path)
-                    shearer_traversed_path_status.set_value(sh.traversed_path_status)
-                    shearer_position.set_value(sh.position)
-                    shearer_position_status.set_value(sh.position_status)
-                    shearer_time_work.set_value(sh.time_work)
-                    shearer_time_work_status.set_value(sh.time_work_status)
-                    shearer_speed_regulation.set_value(sh.speed_regulation)
-                    shearer_speed_regulation_status.set_value(sh.speed_regulation_status)
-                    shearer_position_number_section.set_value(sh.position_number_section)
-                    shearer_position_number_section_status.set_value(sh.position_number_section_status)
-                    shearer_voltage.set_value(sh.voltage)
-                    shearer_voltage_status.set_value(sh.voltage_status)
-                    shearer_error_1.set_value(sh.error_1)
-                    shearer_error_2.set_value(sh.error_2)
-                    shearer_error_3.set_value(sh.error_3)
-                    shearer_error_4.set_value(sh.error_4)
-                    shearer_error_5.set_value(sh.error_5)
-                    shearer_error_6.set_value(sh.error_6)
-                    shearer_error_7.set_value(sh.error_7)
-                    shearer_error_8.set_value(sh.error_8)
-                    shearer_error_9.set_value(sh.error_9)
-                    shearer_error_10.set_value(sh.error_10)
-                    shearer_error_11.set_value(sh.error_11)
-                    shearer_error_12.set_value(sh.error_12)
-                    shearer_status_1.set_value(sh.status_1)
-                    shearer_status_2.set_value(sh.status_2)
-                    shearer_status_3.set_value(sh.status_3)
-                    shearer_status_4.set_value(sh.status_4)
-                    shearer_level_defence_m1.set_value(sh.level_defence_m1)
-                    shearer_level_defence_status_m1.set_value(sh.level_defence_status_m1)
-                    shearer_level_defence_m2.set_value(sh.level_defence_m2)
-                    shearer_level_defence_status_m2.set_value(sh.level_defence_status_m2)
-                    shearer_level_defence_m3.set_value(sh.level_defence_m3)
-                    shearer_level_defence_status_m3.set_value(sh.level_defence_status_m3)
-                    shearer_level_defence_m4.set_value(sh.level_defence_m4)
-                    shearer_level_defence_status_m4.set_value(sh.level_defence_status_m4)
-                    shearer_level_defence_m5.set_value(sh.level_defence_m5)
-                    shearer_level_defence_status_m5.set_value(sh.level_defence_status_m5)
-                    shearer_serial_number.set_value(sh.serial_number)
-                if data[9] == 18 and data[10] == 16:
-                    freq.mfk400(data)
-                    frequency_data_status.set_value(freq.data_status)
-                    frequency_software_version.set_value(freq.software_version)
-                    frequency_output_frequency.set_value(freq.output_frequency)
-                    frequency_output_amperage.set_value(freq.output_amperage)
-                    frequency_output_voltage.set_value(freq.output_voltage)
-                    frequency_voltage_capacitor.set_value(freq.voltage_capacitor)
-                    frequency_sensor_status.set_value(freq.sensor_status)
-                    frequency_voltage_input.set_value(freq.voltage_input)
-                    frequency_sensor_voltage_input_status.set_value(freq.sensor_voltage_input_status)
-                    frequency_temperature_air_shearer.set_value(freq.temperature_air_shearer)
-                    frequency_temperature_air_shearer_status.set_value(freq.temperature_air_shearer_status)
-                    frequency_temperature_modem_shearer.set_value(freq.temperature_modem_shearer)
-                    frequency_temperature_modem_shearer_status.set_value(freq.temperature_modem_shearer_status)
-                    frequency_output_amperage_contactor.set_value(freq.output_amperage_contactor)
-                    frequency_output_amperage_contactor_status.set_value(freq.output_amperage_contactor_status)
-                    frequency_temperature_air_frequency.set_value(freq.temperature_air_frequency)
-                    frequency_temperature_air_icebox_igbt.set_value(freq.temperature_air_icebox_igbt)
-                    # frequency_temperature_usmemovace = 0  # Reg[25]  UNUSED
-                    # frequency_temperature_brzdy_mf = 0  # Reg[26]  UNUSED
-                    frequency_temperature_mf_status.set_value(freq.temperature_mf_status)
-                    frequency_number_mfk.set_value(freq.number_mfk)
-                    frequency_error_1.set_value(freq.error_1)
-                    frequency_error_2.set_value(freq.error_2)
-                    frequency_error_3.set_value(freq.error_3)
-                    frequency_error_4.set_value(freq.error_4)
-                    frequency_error_5.set_value(freq.error_5)
-                    frequency_error_6.set_value(freq.error_6)
-                    frequency_error_7.set_value(freq.error_7)
-                    frequency_error_8.set_value(freq.error_8)
-                    frequency_errorFreelop_1.set_value(freq.errorFreelop_1)
-                    frequency_errorFreelop_2.set_value(freq.errorFreelop_2)
-                    frequency_errorFreelop_3.set_value(freq.errorFreelop_3)
-                    frequency_errorFreelop_4.set_value(freq.errorFreelop_4)
-                    # frequency_errorFdrive.set_value(freq.errorFdrive)
-                    frequency_mfk_status_1.set_value(freq.mfk_status_1)
-                    frequency_mfk_status_2.set_value(freq.mfk_status_2)
-                    frequency_mfk_status_3.set_value(freq.mfk_status_3)
-                    frequency_mfk_status_4.set_value(freq.mfk_status_4)
-                    # frequency_mfk_status_5.set_value(freq.mfk_status_5)
-                    # frequency_mfk_status_6.set_value(freq.mfk_status_6)
-                    # frequency_mfk_status_7.set_value(freq.mfk_status_7)
-                    # frequency_mfk_status_8.set_value(freq.mfk_status_8)
-                    frequency_mfk_concentration_ch4.set_value(freq.mfk_concentration_ch4)
-                    frequency_mfk_concentration_ch4_status.set_value(freq.mfk_concentration_ch4_status)
-                    # frequency_mfk_material_case.set_value(freq.mfk_material_case)
-                    frequency_language.set_value(freq.language)
-                    frequency_mfk_year.set_value(freq.mfk_year)
-                    frequency_mfk_mounth.set_value(freq.mfk_mounth)
-                    frequency_mfk_day.set_value(freq.mfk_day)
-                    frequency_mfk_hour.set_value(freq.mfk_hour)
-                    frequency_mfk_minute.set_value(freq.mfk_minute)
-                    frequency_mfk_second.set_value(freq.mfk_second)
-                    frequency_shearer_year.set_value(freq.shearer_year)
-                    frequency_shearer_mounth.set_value(freq.shearer_mounth)
-                    frequency_shearer_day.set_value(freq.shearer_day)
-                    frequency_shearer_hour.set_value(freq.shearer_hour)
-                    frequency_shearer_minute.set_value(freq.shearer_minute)
-                    frequency_shearer_second.set_value(freq.shearer_second)
-                    frequency_mfk_number_section.set_value(freq.mfk_number_section)
-                    frequency_mfk_number_section_status.set_value(freq.mfk_number_section_status)
-                data = s.recv(BUFFER_SIZE)
-                if i > 100000 or len(data) < 0:
-                    print("Current work state + 100.000 cycle parse data")
-                    break
-        except Exception as exc:
-            print(TCP_IP, ":", TCP_PORT, " connection not succesfull!")
-            print(exc)
-            status_drv_connection = False
-        finally:
-            s.close()
+def get_connect(tcp_ip, tcp_port, tcp_timeout):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(tcp_timeout)
+    s.connect((tcp_ip, tcp_port))
+    try:
+        data = (s.recv(BUFFER_SIZE))
+        if len(data) > 0:
+            while True:
+                parse_data(data)
+                data = (s.recv(BUFFER_SIZE))
+    except Exception as get_connect:
+        print("LOG: get_connect", get_connect)
 
 def current_value_logger(LOG_VALUE_ENABLE):
     if LOG_VALUE_ENABLE == True:
@@ -335,20 +322,28 @@ if __name__ == "__main__":
     frequency_shearer_second = frequency.add_variable(ns_fr, "shearer_second", 0)
     frequency_mfk_number_section = frequency.add_variable(ns_fr, "mfk_number_section", 0)
     frequency_mfk_number_section_status = frequency.add_variable(ns_fr, "mfk_number_section_status", 0)
-    while not status_srv_run:
+
+    if status_srv_run == False:
+        sh = datastruct.tmachinery.Shearer()
+        freq = datastruct.tmachinery.Frequency()
         try:
             server.start()
-            print("Server start at ", datetime.datetime.now())
             status_srv_run = True
-            sh = datastruct.tmachinery.Shearer()
-            freq = datastruct.tmachinery.Frequency()
-            srv = threading.Thread(target=get_data())
-            srv.daemon = True
-            srv.start()
-        except Exception as ex:
-            print("Except server failed: ", ex)
-            status_srv_run = False
-        finally:
-            print("Server stop in ", datetime.datetime.now)
-            server.stop()
+            print("Server start at ", datetime.datetime.now())
+            if status_srv_run == True:
+                try:
+                    con = threading.Thread(target=get_connect(TCP_IP, TCP_PORT, TCP_CONNECT_TIMEOUT))
+                    con.daemon = True
+                    con.start()
+                except socket.timeout as tm:
+                    print("Timeout __", tm)
+                except socket.error as ser:
+                    print("TimeoutError", ser)
+                except Exception as get_connect_err:
+                    print("STOP SUCK ", get_connect_err)
 
+        except Exception as ex_srv_run:
+            print("Server not running ", datetime.datetime.now())
+            print("SRV_RUN: ", ex_srv_run)
+        finally:
+            server.stop()
