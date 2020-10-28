@@ -1,4 +1,4 @@
-import cryptography
+#  import cryptography
 import datetime
 import threading
 
@@ -9,22 +9,22 @@ import datastruct.tmachinery
 product_uri = "EnergyTrain"
 manufacture_name = "LLC mine S.D.Tihova"
 product_name = "tihova-lava"
-version = "0.1"
-build_number = "12"
+version = "0.3"
+build_number = "20"
 build_date = datetime.datetime.today()
 URL = "opc.tcp://0.0.0.0:4840"
 
 TCP_IP = '192.168.11.91'
 TCP_PORT = 1500
 TCP_CONNECT_TIMEOUT = 5  # second
-LOG_VALUE_ENABLE = False
-LOG_VALUE_TIMER = 30 # second
+LOG_VALUE_TIMER = 30  # second
 
 BUFFER_SIZE = 4096
 status_drv_connection = False
 status_srv_run = False
 j = 0
 fstr = []
+
 
 def parse_data(data):
     if data[9] == 16 and data[10] == 16:
@@ -42,8 +42,8 @@ def parse_data(data):
         shearer_motor_status_m4.set_value(sh.motor_current_m4)
         shearer_motor_current_m5.set_value(sh.motor_current_m5)
         shearer_motor_status_m5.set_value(sh.motor_current_m5)
-        shearer_speed.set_value(sh.speed)
-        shearer_speed_status.set_value(sh.speed_status)
+        shearer_current_speed.set_value(sh.current_speed)
+        shearer_current_speed_status.set_value(sh.current_speed_status)
         shearer_current_year.set_value(sh.current_year)
         shearer_current_mounth.set_value(sh.current_mounth)
         shearer_current_day.set_value(sh.current_day)
@@ -54,7 +54,7 @@ def parse_data(data):
         shearer_management_command_panel.set_value(sh.management_command_panel)
         shearer_electro_hydro_valve.set_value(sh.electro_hydro_valve)
         shearer_management_drobilka.set_value(sh.management_drobilka)
-        shearer_sensor_speed.set_value(sh.sensor_speed)
+        shearer_sensor_direction.set_value(sh.sensor_direction)
         shearer_sensor_pologenie.set_value(sh.sensor_pologenie)
         shearer_operation_mode.set_value(sh.operation_mode)
         shearer_type.set_value(sh.shearer_type)
@@ -138,13 +138,13 @@ def parse_data(data):
         frequency_mfk_status_2.set_value(freq.mfk_status_2)
         frequency_mfk_status_3.set_value(freq.mfk_status_3)
         frequency_mfk_status_4.set_value(freq.mfk_status_4)
-        # frequency_mfk_status_5.set_value(freq.mfk_status_5)
-        # frequency_mfk_status_6.set_value(freq.mfk_status_6)
-        # frequency_mfk_status_7.set_value(freq.mfk_status_7)
-        # frequency_mfk_status_8.set_value(freq.mfk_status_8)
+        frequency_mfk_status_5.set_value(freq.mfk_status_5)
+        frequency_mfk_status_6.set_value(freq.mfk_status_6)
+        frequency_mfk_status_7.set_value(freq.mfk_status_7)
+        frequency_mfk_status_8.set_value(freq.mfk_status_8)
         frequency_mfk_concentration_ch4.set_value(freq.mfk_concentration_ch4)
         frequency_mfk_concentration_ch4_status.set_value(freq.mfk_concentration_ch4_status)
-        # frequency_mfk_material_case.set_value(freq.mfk_material_case)
+        frequency_mfk_material_case.set_value(freq.mfk_material_case)
         frequency_language.set_value(freq.language)
         frequency_mfk_year.set_value(freq.mfk_year)
         frequency_mfk_mounth.set_value(freq.mfk_mounth)
@@ -161,6 +161,7 @@ def parse_data(data):
         frequency_mfk_number_section.set_value(freq.mfk_number_section)
         frequency_mfk_number_section_status.set_value(freq.mfk_number_section_status)
 
+
 def get_connect(tcp_ip, tcp_port, tcp_timeout):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(tcp_timeout)
@@ -171,13 +172,28 @@ def get_connect(tcp_ip, tcp_port, tcp_timeout):
             while True:
                 parse_data(data)
                 data = (s.recv(BUFFER_SIZE))
-    except Exception as get_connect:
-        print("LOG: get_connect", get_connect)
+    except Exception as ex_get_connect:
+        print("LOG: get_connect", ex_get_connect)
 
-def current_value_logger(LOG_VALUE_ENABLE):
-    if LOG_VALUE_ENABLE == True:
-        print(sh.__dict__)
-        print(freq.__dict__)
+
+def get_thread():
+    try:
+        con = threading.Thread(target=get_connect(TCP_IP, TCP_PORT, TCP_CONNECT_TIMEOUT))
+        con.daemon = True
+        con.start()
+    except socket.timeout as tm:
+        print("Timeout __", tm)
+    except socket.error as ser:
+        print("TimeoutError", ser)
+    except Exception as get_connect_err:
+        print("STOP SUCK ", get_connect_err)
+
+
+def current_value_logger():
+    #  if LOG_VALUE_ENABLE == True:
+    print(sh.__dict__)
+    print(freq.__dict__)
+
 
 if __name__ == "__main__":
     """Add tags in opcua and start server"""
@@ -198,7 +214,7 @@ if __name__ == "__main__":
     shearer_motor_status_m3 = shearer.add_variable(ns_sh, "motor_sensor_status_m3", 0)
     shearer_motor_status_m4 = shearer.add_variable(ns_sh, "motor_sensor_status_m4", 0)
     shearer_motor_status_m5 = shearer.add_variable(ns_sh, "motor_sensor_status_m5", 0)
-    shearer_speed_status = shearer.add_variable(ns_sh, "speed_sensor_status", 0)
+    shearer_current_speed_status = shearer.add_variable(ns_sh, "speed_sensor_status", 0)
     shearer_position_status = shearer.add_variable(ns_sh, "position_status", 0)
     shearer_time_work_status = shearer.add_variable(ns_sh, "time_work_status", 0)
     shearer_speed_regulation_status = shearer.add_variable(ns_sh, "speed_regulation_status", 0)
@@ -228,12 +244,12 @@ if __name__ == "__main__":
     shearer_motor_current_m3 = shearer.add_variable(ns_sh, "motor_current_m3", 0)
     shearer_motor_current_m4 = shearer.add_variable(ns_sh, "motor_current_m4", 0)
     shearer_motor_current_m5 = shearer.add_variable(ns_sh, "motor_current_m5", 0)
-    shearer_speed = shearer.add_variable(ns_sh, "speed", 0.0)
+    shearer_current_speed = shearer.add_variable(ns_sh, "current_speed", 0.0)
     shearer_management_rele = shearer.add_variable(ns_sh, "management_rele", 0)
     shearer_management_command_panel = shearer.add_variable(ns_sh, "management_command_panel", 0)
     shearer_electro_hydro_valve = shearer.add_variable(ns_sh, "electro_hydro_valve", 0)
     shearer_management_drobilka = shearer.add_variable(ns_sh, "management_drobilka", 0)
-    shearer_sensor_speed = shearer.add_variable(ns_sh, "sensor_speed", 0)
+    shearer_sensor_direction = shearer.add_variable(ns_sh, "sensor_direction", 0)
     shearer_sensor_pologenie = shearer.add_variable(ns_sh, "sensor_pologenie", 0)
     shearer_operation_mode = shearer.add_variable(ns_sh, "operation_mode", 0)
     shearer_type = shearer.add_variable(ns_sh, "shearer_type", 0)
@@ -306,7 +322,7 @@ if __name__ == "__main__":
     frequency_mfk_status_8 = frequency.add_variable(ns_fr, "mfk_status_8", 0)
     frequency_mfk_concentration_ch4 = frequency.add_variable(ns_fr, "mfk_concetration_ch4", 0)
     frequency_mfk_concentration_ch4_status = frequency.add_variable(ns_fr, "mfk_concentration_ch4_status", 0)
-    frequency_mfk_material_case = 0  # Reg[58], uchar, UNUSED
+    frequency_mfk_material_case = frequency.add_variable(ns_fr, "mfk_material_case", 0)  # Reg[58], uchar, UNUSED
     frequency_language = frequency.add_variable(ns_fr, "language", 0)
     frequency_mfk_year = frequency.add_variable(ns_fr, "mfk_year", 0)
     frequency_mfk_mounth = frequency.add_variable(ns_fr, "mfk_mounth", 0)
@@ -323,27 +339,18 @@ if __name__ == "__main__":
     frequency_mfk_number_section = frequency.add_variable(ns_fr, "mfk_number_section", 0)
     frequency_mfk_number_section_status = frequency.add_variable(ns_fr, "mfk_number_section_status", 0)
 
-    if status_srv_run == False:
-        sh = datastruct.tmachinery.Shearer()
-        freq = datastruct.tmachinery.Frequency()
+    sh = datastruct.tmachinery.Shearer()
+    freq = datastruct.tmachinery.Frequency()
+
+    while not status_srv_run:
         try:
             server.start()
             status_srv_run = True
             print("Server start at ", datetime.datetime.now())
-            if status_srv_run == True:
-                try:
-                    con = threading.Thread(target=get_connect(TCP_IP, TCP_PORT, TCP_CONNECT_TIMEOUT))
-                    con.daemon = True
-                    con.start()
-                except socket.timeout as tm:
-                    print("Timeout __", tm)
-                except socket.error as ser:
-                    print("TimeoutError", ser)
-                except Exception as get_connect_err:
-                    print("STOP SUCK ", get_connect_err)
-
+            while status_srv_run:
+                get_thread()
         except Exception as ex_srv_run:
             print("Server not running ", datetime.datetime.now())
             print("SRV_RUN: ", ex_srv_run)
         finally:
-            server.stop()
+            status_srv_run = False
